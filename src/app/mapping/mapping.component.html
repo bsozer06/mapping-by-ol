@@ -1,0 +1,25 @@
+<!-- Side navigation -->
+<div class="sidenav">
+  <a href="#">Katmanlar</a>
+  <a href="#">Alan Çiz</a>
+  <a href="#">Mesafe ölç</a>
+  <a href="#">Bilgi export</a>
+</div>
+
+<div class="main">
+  <p>mapping works!</p>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-sm-6">
+        <!-- # one side is a map, another is different. -->
+        <div id="map" class="map-container" (click)="getCoordinates($event)"></div>
+        <!-- <div id="map" class="map-container" (document:mousemove)="onMouseMove($event)"></div> -->
+        <div>{{ coordX }} , {{ coordY }}</div>
+      </div>
+      <div class="col-md-6 col-sm-6">
+        second
+      </div>
+    </div>
+  </div>
+</div>
