@@ -6,11 +6,14 @@ import { Extent } from 'ol/extent';
 import {get as GetProjection} from 'ol/proj'
 import {register}  from 'ol/proj/proj4';
 import TileLayer from 'ol/layer/Tile';
-import { TileWMS } from 'ol/source';
+import { TileWMS, Vector as VectorSource} from 'ol/source';
 import Projection from 'ol/proj/Projection';
 import OSM, {ATTRIBUTION} from 'ol/source/OSM';
 import { ScaleLine, defaults as DefaultControls, MousePosition} from 'ol/control';
 import proj4 from 'proj4';
+import Draw, { createBox } from 'ol/interaction/Draw';
+import GeometryType from 'ol/geom/GeometryType';
+import { mapToMapExpression } from '@angular/compiler/src/render3/util';
 
 
 @Component({
@@ -18,6 +21,7 @@ import proj4 from 'proj4';
   templateUrl: './mapping.component.html',
   styleUrls: ['./mapping.component.scss']
 })
+
 export class MappingComponent implements AfterViewInit {
 
   Map: Map;
@@ -36,8 +40,6 @@ export class MappingComponent implements AfterViewInit {
 
   constructor(private zone: NgZone, private cd: ChangeDetectorRef) { }
 
-  // @HostListener('document:mousemove', ['$event'])
-
 
   ngAfterViewInit(): void {
     if(! this.Map) {
@@ -49,14 +51,14 @@ export class MappingComponent implements AfterViewInit {
       source: new TileWMS({
         url: 'http://localhost:8080/geoserver/Burhan/wms',
         params: {
-          'LAYERS': 'Burhan:NoktalarPoint',
+          'LAYERS': 'Burhan:ankara_roads',
           'TILED': true
         },
         projection: 'EPSG:3857',
         serverType: 'geoserver'
       })
     });
-    // this.mapId2 = "map";
+
     this.Map.addLayer(examplelayer);
 
   }
@@ -87,32 +89,34 @@ export class MappingComponent implements AfterViewInit {
       ])
     });
 
-    // var mousePositionControl = new MousePosition({
-    //   coordinateFormat: createStringXY(4),
-    //   projection: 'EPSG:4326',
-    //   className: 'custom-mouse-position',
-    //   target: document.getElementById('mouse-position'),
-    //   undefinedHTML: '&nbsp;'
-    // })
-
+    // var source: VectorSource = new VectorSource({wrapX: false});
+    // var typeSelect = <HTMLInputElement>document.getElementById('type');       // in typescript for using document
+    // function addInteraction() {
+    //   var value = typeSelect.value;
+    //   if (value !== 'None') {
+    //     this.draw = new Draw({
+    //       source: source,
+    //       type: typeSelect.value as GeometryType,
+    //       geometryFunction: createBox()
+    //     });
+    //     Map.prototype.addInteraction(this.draw);
+    //   }
+    //   const that = this;
+    //   this.draw.on('drawend', (event) => {
+    //     that.Map.removeInteraction(this.draw);
+    //     that.savedPolygon = event.feature.getGeometry();
+    //     that.draw = null;
+    // });
   }
 
   // When clicking, coordinates
   getCoordinates(event: any) {
     this.coord = this.Map.getEventCoordinate(event);
-    // this.Map.addEventListener("mousemove", event)
     this.coordX = this.coord[0].toFixed(3);
     this.coordY = this.coord[1].toFixed(3);
     console.log(this.coord);
     this.coordString = `x and y: ${this.coord}`;
     console.log(this.coordString);
-
-
   }
-
-  //// mause positions
-  // onMouseMove(e) {
-  //   console.log(e);
-  // }
 
 }
