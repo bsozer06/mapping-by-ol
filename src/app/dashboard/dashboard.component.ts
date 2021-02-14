@@ -6,7 +6,7 @@ import { Coordinate, createStringXY } from 'ol/coordinate';
 import { Extent } from 'ol/extent';
 import { get as GetProjection } from 'ol/proj'
 import TileLayer from 'ol/layer/Tile';
-import { BingMaps, TileWMS, Vector, Vector as VectorSource } from 'ol/source';
+import { BingMaps, Stamen, TileWMS, Vector, Vector as VectorSource, XYZ } from 'ol/source';
 import Projection from 'ol/proj/Projection';
 import OSM, { ATTRIBUTION } from 'ol/source/OSM';
 import { ScaleLine, defaults as DefaultControls, MousePosition, Zoom, Rotate, Attribution, ZoomSlider, OverviewMap, defaults, Control } from 'ol/control';
@@ -20,10 +20,6 @@ import Fill from 'ol/style/Fill';
 import { CoordinateFormat } from 'ol/coordinate';
 import Layer from 'ol/layer/Layer';
 import LayerGroup from 'ol/layer/Group';
-import { title } from 'process';
-import BaseObject from 'ol/Object';
-
-
 
 
 @Component({
@@ -33,19 +29,16 @@ import BaseObject from 'ol/Object';
 })
 export class DashboardComponent implements OnInit {
   map: Map;
-  // center: Coordinate = [3912489.7690, 4842274.4180];
-  // zoom: number = 5.5;
   bingMapAerial: TileLayer;
   osmMap: TileLayer;
   baseLayerGroup: LayerGroup;
   layerGroup: LayerGroup;
   view: View;
   projection: Projection;
-  // extent: Extent = [-20026376.39, -20048966.10, 20026376.39, 20048966.10];
   coordinates: any;
   coord_x: any;
   coord_y: any;
-  vectorLayerPoligon: VectorLayer;
+  // vectorLayerPoligon: VectorLayer;
   vectorLayerNokta: VectorLayer;
   mousePositionControl: MousePosition;
   ControlOptions: Control[];
@@ -56,14 +49,24 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
 
-    // OSM map
+    //************** BASE MAP LAYERS *************//
+    // OSM Standard Base Map Layer
     this.osmMap = new TileLayer({
       source: new OSM(),
       visible: true,
     });
     this.osmMap.set('title', 'OSMStandard');
 
-    // bing map
+    // OSM Humanitarian Map Layer
+    const osmHumanitarianLayer = new TileLayer({
+      source: new OSM({
+        url: 'https://{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png'
+      }),
+      visible: false,
+    });
+    osmHumanitarianLayer.set('title', 'OSMHumanitarian');
+
+    // Bing Base Map Layer
     this.bingMapAerial = new TileLayer({
       source: new BingMaps({
         key: "AvEPE9OOrtC2me4zpFzF60eXuZPtmxFMNi5TvJYlRZNlxlQfcZHvl9M0f66lbqGa",
@@ -73,28 +76,64 @@ export class DashboardComponent implements OnInit {
     });
     this.bingMapAerial.set('title', 'BingMaps');
 
-  //   const openstreetMapHumanitarianLayer = new TileLayer({
-  //     source: new OSM({
-  //         url: 'https://{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png'
-  //     }),
-  //     visible: false,
-  // })
+    // CartoDb Positron without labels Base Map Layer
+    const cartoDbLightMap = new TileLayer({
+      source: new XYZ({
+        url: 'https://{1-4}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png',
+        attributions: '© CARTO'
+      }),
+      visible: false,
+    });
+    cartoDbLightMap.set('title', 'CartoDBLight');
 
-    // turkiyenin il siniri poligon geojson
-    this.vectorLayerPoligon = new VectorLayer({
+    // CartoDb Dark Matter with labels Base Map Layer
+    const cartoDbDarkMap = new TileLayer({
+      source: new XYZ({
+        url: 'https://{1-4}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png',
+        attributions: '© CARTO'
+      }),
+      visible: false,
+    });
+    cartoDbDarkMap.set('title', 'CartoDBDark');
+
+    // Stamen Toner Map
+    const stamenTonerMap = new TileLayer({
+      source: new XYZ({
+        url: 'http://tile.stamen.com/toner/{z}/{x}/{y}.png',
+        attributions: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
+      }),
+      visible: false
+    });
+    stamenTonerMap.set('title', 'stamenTonerMap');
+
+    // Stamen Watercolor Map
+    const stamenWatercolornMap = new TileLayer({
+      source: new Stamen({
+        layer: 'watercolor',      /// or "toner"or "terrain-labels" for alternative
+      }),
+      visible: false
+    });
+    stamenWatercolornMap.set('title', 'stamenWatercolornMap');
+
+
+    //************** Vector LAYERS *************//
+    // The city boundries of Turkey using GeoJSON data
+    // this.vectorLayerPoligon = new VectorLayer({
+    const TcCitiesGeoJSON = new VectorLayer({
       source: new Vector({
         format: new GeoJSON({
           dataProjection: 'EPSG:4326'
         }),
         url: "./assets/TcIller.geojson",
-        attributions: []
+        // attributions: []
       }),
-      visible: true,
-      zIndex: 1
+      visible: false,
     });
+    TcCitiesGeoJSON.set('title', 'TcCitiesGeoJSON')
 
     // turkiyenin il merkez noktalari geojson
-    this.vectorLayerNokta = new VectorLayer({
+    // this.vectorLayerNokta = new VectorLayer({
+      const TcCityCentersGeoJSON = new VectorLayer({
       source: new Vector({
         format: new GeoJSON({
           dataProjection: 'EPSG:4326'
@@ -116,9 +155,11 @@ export class DashboardComponent implements OnInit {
           rotation: Math.PI
         })
       }),
-      zIndex: 1,
-      visible: true
+      // zIndex: 1,
+      visible: false
     });
+    TcCityCentersGeoJSON.set('title', 'TcCityCentersGeoJSON');
+
 
     this.ControlOptions = [     // in the book
       new Zoom({
@@ -141,13 +182,12 @@ export class DashboardComponent implements OnInit {
 
     this.map = new Map({
       target: 'map',    // div icerisinde cagrilacak sinif
-      // layers: this.baseLayerGroup,     // harit katmanlar on harita
       controls: this.ControlOptions,           // defaults
       // controls: DefaultControls().extend([this.mousePositionControl]),
       interactions: olInteraction.defaults().extend(
         [
           /// yuklenen geojson'a secme imkani sagliyor !!!
-          new olInteraction.Select({ layers: [this.vectorLayerPoligon, this.vectorLayerNokta] }),
+          new olInteraction.Select({ layers: [TcCitiesGeoJSON, this.vectorLayerNokta] }),
         ]
       ),
       view: new View({      // harita acilince merkez ve zooom seviyesini tanimlar !
@@ -156,62 +196,51 @@ export class DashboardComponent implements OnInit {
       })
     });
 
-    // layer group olusturuldu cunku array olarak add islemi yapilamaz !
-    this.layerGroup = new LayerGroup({
-      layers: [this.vectorLayerPoligon, this.vectorLayerNokta]
-    });
-    this.map.addLayer(this.layerGroup);
 
-
+    // Adding Base Map Layer as a Layer group
     this.baseLayerGroup = new LayerGroup({
-      layers: [this.osmMap, this.bingMapAerial]
+      layers: [this.osmMap, this.bingMapAerial, osmHumanitarianLayer, cartoDbLightMap, cartoDbDarkMap, stamenTonerMap, stamenWatercolornMap]
     });
     this.map.addLayer(this.baseLayerGroup);
 
-
+    /// Radio Settings for Base Map Layers
     this.baseLayerGroupElements = document.querySelectorAll('.sidenav > input[type=radio]');
     for (let baseLayerGroupElement of this.baseLayerGroupElements) {
       let baseLayerGroupLayers = this.baseLayerGroup.getLayers();
-      baseLayerGroupElement.addEventListener('change',function(e) {
+      baseLayerGroupElement.addEventListener('change', function (e) {
         let baseLayerGroupValue = e.target.value;
-        baseLayerGroupLayers.forEach(function(element, index, array) {
-          // let baseLayerName = element.getClassName();
+        baseLayerGroupLayers.forEach(function (element, index, array) {
           let baseLayerName = element.get('title');
           element.setVisible(baseLayerName === baseLayerGroupValue);
           console.log(baseLayerName, baseLayerGroupValue);
-
         })
       })
-    }
-
-    //  console.log(baseLayerGroupElements);
+    };
 
 
-    // this.baseLayerGroup.getLayers().foreach(function(element, index, array) {
-    //     let baseLayerName = element.get('title')
-    //     console.log(baseLayerName);
-    // };
+    // layer group olusturuldu cunku array olarak add islemi yapilamaz !
+    this.layerGroup = new LayerGroup({
+      layers: [TcCitiesGeoJSON, TcCityCentersGeoJSON]
+    });
+    this.map.addLayer(this.layerGroup);
 
-
-    // this.baseLayerElements = document.querySelectorAll('.sidenav > input[type=radio]');
-    // for (let baseLayerElement of this.baseLayerElements) {
-    //   baseLayerElement.addEventListener('change', function() {
-    //     console.log(this.value);
-    //     let baseLayerElementValue = this.value;
-    //     console.log(this.baseLayerGroup.getLayers());
-    //     // this.baseLayerGroup.getLayers().forEach(function(element, index, array){
-    //     //   let baseLayerName = element.get('title');
-    //     //   element.setVisible(baseLayerName === baseLayerElementValue)
-    //     // })
-    //   })
-    // }
-
-
-    // this.map.addControl(this.mousePositionControl);
-
-
-
-
+    // Checkbox settings for switching based on layers
+    const layerCheckboxElements = document.querySelectorAll('.sidenav > input[type=checkbox]');
+    layerCheckboxElements.forEach( (layerCheckboxElement) => {
+      layerCheckboxElement.addEventListener('click', (event) => {
+        let selectedLayer;
+        let layerCheckboxElementTarget = event.target as HTMLInputElement;      /// to reach "value" in the template of checkbox
+        let layerCheckboxElementValue = layerCheckboxElementTarget.value;
+        // console.log(this.layerGroup.getLayers());
+        this.layerGroup.getLayers().forEach(function(element, index, array) {
+          if(layerCheckboxElementValue === element.get('title')) {
+            selectedLayer = element;
+          }
+        })
+        let inEvent = event.target as HTMLInputElement;
+        inEvent.checked ? selectedLayer.setVisible(true) : selectedLayer.setVisible(false);
+      })
+    })
 
 
   }

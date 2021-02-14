@@ -1,9 +1,24 @@
 <div class="sidenav">
-  <h4 href="#">Base Layers</h4>
-  <input type="radio" name='baseLayerRadioButton' value='OSMStandard' style="margin-left: 10px;" checked>
+  <h4>Base Map Layers</h4>
+  <input type="radio" name='baseMapLayerRadio' value='OSMStandard' style="margin-left: 10px;" checked>
   <label class="radioLayer">OSM Standard</label><br>
-  <input type="radio" name='baseLayerRadioButton' value='BingMaps' style="margin-left: 10px;">
+  <input type="radio" name='baseMapLayerRadio' value='OSMHumanitarian' style="margin-left: 10px;">
+  <label class="radioLayer">OSM Humanitarian</label><br>
+  <input type="radio" name='baseMapLayerRadio' value='BingMaps' style="margin-left: 10px;">
   <label class="radioLayer">Bing</label><br>
+  <input type="radio" name='baseMapLayerRadio' value='CartoDBLight' style="margin-left: 10px;">
+  <label class="radioLayer">CartoDB Light</label><br>
+  <input type="radio" name='baseMapLayerRadio' value='CartoDBDark' style="margin-left: 10px;">
+  <label class="radioLayer">CartoDB Dark</label><br>
+  <input type="radio" name='baseMapLayerRadio' value='stamenTonerMap' style="margin-left: 10px;">
+  <label class="radioLayer">Stamen Toner</label><br>
+  <input type="radio" name='baseMapLayerRadio' value='stamenWatercolornMap' style="margin-left: 10px;">
+  <label class="radioLayer">Stamen Watercolor</label><br>
+  <h4>Vector Layers</h4>
+  <input type="checkbox" name="layerCheckBox" value="TcCitiesGeoJSON" style="margin-left: 10px;">
+  <label class="checkBoxLayer">Boundaries of Turkey</label><br>
+  <input type="checkbox" name="layerCheckBox" value="TcCityCentersGeoJSON" style="margin-left: 10px;">
+  <label class="checkBoxLayer">City Center in Turkey</label><br>
 </div>
 
 <!-- <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
