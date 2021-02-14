@@ -2,7 +2,7 @@
 
 #map {
   height: 600px;
-  width: 100%
+  width: auto;
 }
 
 #coordinates {
@@ -15,12 +15,6 @@
   height:25%;
 }
 
-.layertree {
-  width: 20%;
-  height: calc(100% - 3.5em);
-  float: left;
-}
-
 .ol-zoom .ol-zoom-in {
   border-radius: 50%;
 }
@@ -30,6 +24,57 @@
   width: 2px;
   }
 
+// Side bar settings !
+/* The sidebar menu */
+.sidenav {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 200px; /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
+  background-color: #111; /* Black */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px;
+}
+/* The navigation menu links */
+.sidenav a {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: #c5c2c2;
+  display: block;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+.radioLayer {
+  color:rgb(191, 207, 207);
+}
+.radioLayer:hover {
+  color: white;
+}
+h4 {
+  color:rgb(122, 129, 129);
+  margin-left: 10px;
+}
+h4:hover {
+  color: white;
+}
+
+/* Style page content */
+.main {
+  margin-left: 100px; /* Same as the width of the sidebar */
+  padding: 0px 50px;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
 
 
 /***** Bunlar eski stiller yenide calismiyor !!!!!! ********/
