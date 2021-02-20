@@ -1,10 +1,10 @@
 import 'ol/ol.css';
 import { registerLocaleData } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, NgZone, OnInit, Output, ViewChild } from '@angular/core';
-import { View, Map, Tile } from 'ol';
+import { View, Map, Tile, Overlay, Feature } from 'ol';
 import { Coordinate, createStringXY } from 'ol/coordinate';
 import { Extent } from 'ol/extent';
-import { get as GetProjection } from 'ol/proj'
+import { get as GetProjection, transform } from 'ol/proj'
 import TileLayer from 'ol/layer/Tile';
 import { BingMaps, Stamen, TileWMS, Vector, Vector as VectorSource, XYZ } from 'ol/source';
 import Projection from 'ol/proj/Projection';
@@ -20,6 +20,9 @@ import Fill from 'ol/style/Fill';
 import { CoordinateFormat } from 'ol/coordinate';
 import Layer from 'ol/layer/Layer';
 import LayerGroup from 'ol/layer/Group';
+import { mapToMapExpression } from '@angular/compiler/src/render3/util';
+import { features } from 'process';
+import OverlayPositioning from 'ol/OverlayPositioning';
 
 
 @Component({
@@ -50,10 +53,30 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
 
     //************** BASE MAP LAYERS *************//
+    // Google Road Base Map Layer
+    const googleRoadMap = new TileLayer({
+      source: new XYZ({
+        url: "http://mt{0-3}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+        attributions: "© Google Roads Map",
+      }),
+      visible: false
+    })
+    googleRoadMap.set("title", "googleRoadMap");
+
+    const googleSatelliteMap = new TileLayer({
+      source: new XYZ({
+        url: "http://mt{0-3}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+        attributions: "© Google Satellite Map",
+        attributionsCollapsible: false
+      }),
+      visible: true
+    })
+    googleSatelliteMap.set("title", "googleSatelliteMap");
+
     // OSM Standard Base Map Layer
     this.osmMap = new TileLayer({
       source: new OSM(),
-      visible: true,
+      visible: false,
     });
     this.osmMap.set('title', 'OSMStandard');
 
@@ -127,13 +150,13 @@ export class DashboardComponent implements OnInit {
         url: "./assets/TcIller.geojson",
         // attributions: []
       }),
-      visible: false,
+      visible: true,
     });
     TcCitiesGeoJSON.set('title', 'TcCitiesGeoJSON')
 
     // turkiyenin il merkez noktalari geojson
     // this.vectorLayerNokta = new VectorLayer({
-      const TcCityCentersGeoJSON = new VectorLayer({
+    const TcCityCentersGeoJSON = new VectorLayer({
       source: new Vector({
         format: new GeoJSON({
           dataProjection: 'EPSG:4326'
@@ -159,6 +182,22 @@ export class DashboardComponent implements OnInit {
       visible: false
     });
     TcCityCentersGeoJSON.set('title', 'TcCityCentersGeoJSON');
+
+    //************** Services LAYERS *************//
+    const roadsInAnkara = new TileLayer({
+      source: new TileWMS({
+        url: "http://localhost:8080/geoserver/Burhan/wms",
+        params: {
+          'LAYERS': 'Burhan:ankara_roads',
+          'FORMAT': 'image/png',
+          'TRANSPARENT': true,
+          'TILE': true
+        },
+        serverType: 'geoserver',
+      }),
+      visible: false
+    });
+    roadsInAnkara.set('title', "roadsInAnkara");
 
 
     this.ControlOptions = [     // in the book
@@ -191,15 +230,18 @@ export class DashboardComponent implements OnInit {
         ]
       ),
       view: new View({      // harita acilince merkez ve zooom seviyesini tanimlar !
-        center: [0, 0],
-        zoom: 2
+        center: transform([34, 39], 'EPSG:4326', 'EPSG:3857'),      //// ol.proj.transform()
+        zoom: 6
       })
     });
 
 
     // Adding Base Map Layer as a Layer group
     this.baseLayerGroup = new LayerGroup({
-      layers: [this.osmMap, this.bingMapAerial, osmHumanitarianLayer, cartoDbLightMap, cartoDbDarkMap, stamenTonerMap, stamenWatercolornMap]
+      layers: [
+        googleRoadMap, googleSatelliteMap, this.osmMap, this.bingMapAerial, osmHumanitarianLayer, cartoDbLightMap, cartoDbDarkMap,
+        stamenTonerMap, stamenWatercolornMap
+      ]
     });
     this.map.addLayer(this.baseLayerGroup);
 
@@ -220,20 +262,20 @@ export class DashboardComponent implements OnInit {
 
     // layer group olusturuldu cunku array olarak add islemi yapilamaz !
     this.layerGroup = new LayerGroup({
-      layers: [TcCitiesGeoJSON, TcCityCentersGeoJSON]
+      layers: [TcCitiesGeoJSON, TcCityCentersGeoJSON, roadsInAnkara]
     });
     this.map.addLayer(this.layerGroup);
 
     // Checkbox settings for switching based on layers
     const layerCheckboxElements = document.querySelectorAll('.sidenav > input[type=checkbox]');
-    layerCheckboxElements.forEach( (layerCheckboxElement) => {
+    layerCheckboxElements.forEach((layerCheckboxElement) => {
       layerCheckboxElement.addEventListener('click', (event) => {
         let selectedLayer;
         let layerCheckboxElementTarget = event.target as HTMLInputElement;      /// to reach "value" in the template of checkbox
         let layerCheckboxElementValue = layerCheckboxElementTarget.value;
         // console.log(this.layerGroup.getLayers());
-        this.layerGroup.getLayers().forEach(function(element, index, array) {
-          if(layerCheckboxElementValue === element.get('title')) {
+        this.layerGroup.getLayers().forEach(function (element, index, array) {
+          if (layerCheckboxElementValue === element.get('title')) {
             selectedLayer = element;
           }
         })
@@ -241,6 +283,44 @@ export class DashboardComponent implements OnInit {
         inEvent.checked ? selectedLayer.setVisible(true) : selectedLayer.setVisible(false);
       })
     })
+
+
+    // const overlayPopupElement = document.querySelector('overlay-popup-container');
+    // const overlayPopupName = document.getElementById('popup-feature-name');
+    // const overlayPopupInfo = document.getElementById('popup-feature-info');
+    const overlayLayer = new Overlay({
+      element: document.querySelector('overlay-popup-container') as HTMLInputElement,
+      autoPan: true,
+      autoPanAnimation: {
+        duration: 250,
+      },
+    });
+    this.map.addOverlay(overlayLayer);
+
+    this.map.on('singleclick', (evt) => {
+      // evt.map.forEachLayerAtPixel(evt.pixel, function(feature, layer) {      /// sağlıklı yaklasim degil -- arrow daha iyi
+      this.map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
+        overlayLayer.setPosition(undefined);
+        // console.log(document.querySelector('overlay-popup-container'));
+        // console.log(feature, layer);
+        console.log(feature.getProperties());
+        // console.log(feature.get("iladi"));
+        let clickedCoordinate = evt.coordinate;
+        let clickedFeatureName = feature.get("iladi");
+        let clickedFeatureCode = feature.get("il_prinx");
+        if (clickedFeatureCode && clickedFeatureName != undefined) {
+          // overlayLayer.setPositioning("TOP_LEFT" as OverlayPositioning);
+          document.querySelector('overlay-popup-container').innerHTML = `
+            <p>${clickedFeatureName}</p>
+            <p>${clickedFeatureCode}</p>
+          `;
+          // document.getElementById('popup-feature-name').innerHTML = clickedFeatureName;
+          // document.getElementById('popup-feature-info').innerHTML = clickedFeatureCode;
+          overlayLayer.setPosition(clickedCoordinate);
+          // console.log(document.getElementById('popup-feature-name'));
+        }
+      })
+    });
 
 
   }

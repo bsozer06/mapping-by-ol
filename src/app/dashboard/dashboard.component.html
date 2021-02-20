@@ -1,6 +1,10 @@
 <div class="sidenav">
   <h4>Base Map Layers</h4>
-  <input type="radio" name='baseMapLayerRadio' value='OSMStandard' style="margin-left: 10px;" checked>
+  <input type="radio" name='baseMapLayerRadio' value='googleSatelliteMap' style="margin-left: 10px;" checked>
+  <label class="radioLayer">Google Satellite Map</label><br>
+  <input type="radio" name='baseMapLayerRadio' value='googleRoadMap' style="margin-left: 10px;">
+  <label class="radioLayer">Google Roads Map</label><br>
+  <input type="radio" name='baseMapLayerRadio' value='OSMStandard' style="margin-left: 10px;" >
   <label class="radioLayer">OSM Standard</label><br>
   <input type="radio" name='baseMapLayerRadio' value='OSMHumanitarian' style="margin-left: 10px;">
   <label class="radioLayer">OSM Humanitarian</label><br>
@@ -15,46 +19,24 @@
   <input type="radio" name='baseMapLayerRadio' value='stamenWatercolornMap' style="margin-left: 10px;">
   <label class="radioLayer">Stamen Watercolor</label><br>
   <h4>Vector Layers</h4>
-  <input type="checkbox" name="layerCheckBox" value="TcCitiesGeoJSON" style="margin-left: 10px;">
+  <input type="checkbox" name="layerCheckBox" value="TcCitiesGeoJSON" style="margin-left: 10px;" checked>
   <label class="checkBoxLayer">Boundaries of Turkey</label><br>
   <input type="checkbox" name="layerCheckBox" value="TcCityCentersGeoJSON" style="margin-left: 10px;">
   <label class="checkBoxLayer">City Center in Turkey</label><br>
+  <h4>Services</h4>
+  <input type="checkbox" name="layerCheckBox" value="roadsInAnkara" style="margin-left: 10px;">
+  <label class="checkBoxLayer">The roads of Ankara</label>
 </div>
-
-<!-- <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
-  <ul class="nav sidebar-nav">
-    <li class="sidebar-brand">
-      <a href="#">
-        Brand
-      </a>
-    </li>
-    <li class="dropdown">
-      <a href="#" class="dropdown-toggle" data-toggle="dropdown">Works <span class="caret"></span></a>
-      <ul class="dropdown-menu" role="menu">
-        <li class="dropdown-header">Dropdown heading</li>
-        <li><a href="#">Action</a></li>
-        <li><a href="#">Another action</a></li>
-        <li><a href="#">Something else here</a></li>
-        <li><a href="#">Separated link</a></li>
-        <li><a href="#">One more separated link</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav> -->
-
-<!-- <div class="grid-container">
-  <div class="grid-1">
-    <div class="sidebar">
-      <h2>Base Layers</h2>
-      <input type="radio" name='baseLayerRadioButton' value='OSMStandard' checked>OSM Standard<br>
-      <input type="radio" name='baseLayerRadioButton' value='BingMaps'>Bing Maps<br>
-
-    </div>
-  </div>
-</div> -->
 
 <p style="margin-left: 200px">dashboard is working !!</p>
+
 <div class="map-container" style="margin-left: 200px">
-  <div id="map" class="map"></div>
+  <div id="map" class="map">
+    <div class="overlay-popup-container">
+      <!-- <span class="overlay-popup-text" id="popup-feature-name"></span><br>
+      <span class="overlay-popup-text" id="popup-feature-info"></span><br> -->
+    </div>
+  </div>
   <div id="coordinates"><span id="coordinate-span">Koordinatlar</span></div>
 </div>
+
