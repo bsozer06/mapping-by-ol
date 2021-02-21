@@ -14,6 +14,12 @@
       <div class="col-md-6 col-sm-6">
         <!-- # one side is a map, another is different. -->
         <h3>Harita gösterimi</h3>
+
+        <div id="popup" class="ol-popup">
+          <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+          <div id="popup-content"></div>
+        </div>
+
         <div id="map" class="map-container" (click)="getCoordinates($event)"></div>
         <div>{{ coordX }} , {{ coordY }}</div>
       </div>

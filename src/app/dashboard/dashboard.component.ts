@@ -223,6 +223,7 @@ export class DashboardComponent implements OnInit {
       target: 'map',    // div icerisinde cagrilacak sinif
       controls: this.ControlOptions,           // defaults
       // controls: DefaultControls().extend([this.mousePositionControl]),
+      // interactions: olInteraction.defaults(),
       interactions: olInteraction.defaults().extend(
         [
           /// yuklenen geojson'a secme imkani sagliyor !!!
@@ -285,42 +286,38 @@ export class DashboardComponent implements OnInit {
     })
 
 
-    // const overlayPopupElement = document.querySelector('overlay-popup-container');
-    // const overlayPopupName = document.getElementById('popup-feature-name');
-    // const overlayPopupInfo = document.getElementById('popup-feature-info');
+    ///// Getting info from features !!!!
     const overlayLayer = new Overlay({
-      element: document.querySelector('overlay-popup-container') as HTMLInputElement,
+      element: document.querySelector('.overlay-popup-container') as HTMLInputElement,
       autoPan: true,
       autoPanAnimation: {
         duration: 250,
       },
+      offset: [9, 9]
     });
+
     this.map.addOverlay(overlayLayer);
 
-    this.map.on('singleclick', (evt) => {
+    this.map.on('click', (evt) => {
       // evt.map.forEachLayerAtPixel(evt.pixel, function(feature, layer) {      /// sağlıklı yaklasim degil -- arrow daha iyi
       this.map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
         overlayLayer.setPosition(undefined);
-        // console.log(document.querySelector('overlay-popup-container'));
         // console.log(feature, layer);
         console.log(feature.getProperties());
-        // console.log(feature.get("iladi"));
         let clickedCoordinate = evt.coordinate;
         let clickedFeatureName = feature.get("iladi");
         let clickedFeatureCode = feature.get("il_prinx");
         if (clickedFeatureCode && clickedFeatureName != undefined) {
           // overlayLayer.setPositioning("TOP_LEFT" as OverlayPositioning);
-          document.querySelector('overlay-popup-container').innerHTML = `
-            <p>${clickedFeatureName}</p>
-            <p>${clickedFeatureCode}</p>
-          `;
-          // document.getElementById('popup-feature-name').innerHTML = clickedFeatureName;
-          // document.getElementById('popup-feature-info').innerHTML = clickedFeatureCode;
+          // console.log(clickedFeatureName);
+          document.getElementById('popup-feature-name').innerHTML = clickedFeatureName;
+          document.getElementById('popup-feature-info').innerHTML = clickedFeatureCode;
           overlayLayer.setPosition(clickedCoordinate);
-          // console.log(document.getElementById('popup-feature-name'));
         }
       })
     });
+
+
 
 
   }

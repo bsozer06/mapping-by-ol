@@ -4,7 +4,7 @@
   <label class="radioLayer">Google Satellite Map</label><br>
   <input type="radio" name='baseMapLayerRadio' value='googleRoadMap' style="margin-left: 10px;">
   <label class="radioLayer">Google Roads Map</label><br>
-  <input type="radio" name='baseMapLayerRadio' value='OSMStandard' style="margin-left: 10px;" >
+  <input type="radio" name='baseMapLayerRadio' value='OSMStandard' style="margin-left: 10px;">
   <label class="radioLayer">OSM Standard</label><br>
   <input type="radio" name='baseMapLayerRadio' value='OSMHumanitarian' style="margin-left: 10px;">
   <label class="radioLayer">OSM Humanitarian</label><br>
@@ -31,12 +31,14 @@
 <p style="margin-left: 200px">dashboard is working !!</p>
 
 <div class="map-container" style="margin-left: 200px">
-  <div id="map" class="map">
-    <div class="overlay-popup-container">
-      <!-- <span class="overlay-popup-text" id="popup-feature-name"></span><br>
-      <span class="overlay-popup-text" id="popup-feature-info"></span><br> -->
-    </div>
+
+  <div class="overlay-popup-container">
+    <span class="overlay-popup-text" id="popup-feature-name"></span><br>
+    <span class="overlay-popup-text" id="popup-feature-info"></span><br>
   </div>
+
+  <div id="map" class="map"></div>
   <div id="coordinates"><span id="coordinate-span">Koordinatlar</span></div>
 </div>
+
 

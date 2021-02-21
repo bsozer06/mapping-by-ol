@@ -14,6 +14,12 @@ import proj4 from 'proj4';
 import Draw, { createBox } from 'ol/interaction/Draw';
 import GeometryType from 'ol/geom/GeometryType';
 import { mapToMapExpression } from '@angular/compiler/src/render3/util';
+import Overlay from 'ol/Overlay';
+import {toStringHDMS} from 'ol/coordinate';
+import {toLonLat} from 'ol/proj';
+import XYZ from 'ol/source/XYZ';
+
+
 
 
 @Component({
@@ -107,6 +113,45 @@ export class MappingComponent implements AfterViewInit {
     //     that.savedPolygon = event.feature.getGeometry();
     //     that.draw = null;
     // });
+
+
+    /**
+ * Elements that make up the popup.
+ */
+var container = document.getElementById('popup');
+var content = document.getElementById('popup-content');
+var closer = document.getElementById('popup-closer');
+
+/**
+ * Create an overlay to anchor the popup to the map.
+ */
+var overlay = new Overlay({
+  element: container,
+  autoPan: true,
+  autoPanAnimation: {
+    duration: 250,
+  },
+});
+
+/**
+ * Add a click handler to hide the popup.
+ */
+closer.onclick = function () {
+  overlay.setPosition(undefined);
+  closer.blur();
+  return false;
+};
+
+this.Map.on('singleclick', function (evt) {
+  var coordinate = evt.coordinate;
+  var hdms = toStringHDMS(toLonLat(coordinate));
+
+  content.innerHTML = '<p>You clicked here:</p><code>' + hdms + '</code>';
+  overlay.setPosition(coordinate);
+});
+  this.Map.addOverlay(overlay);
+
+
   }
 
   // When clicking, coordinates
