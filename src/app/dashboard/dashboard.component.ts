@@ -1,3 +1,5 @@
+import { faLayerGroup, faMapSigns, faAtlas } from '@fortawesome/free-solid-svg-icons';
+
 import 'ol/ol.css';
 import { registerLocaleData } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, NgZone, OnInit, Output, ViewChild } from '@angular/core';
@@ -47,6 +49,9 @@ export class DashboardComponent implements OnInit {
   ControlOptions: Control[];
   baseLayerElements: any;
   baseLayerGroupElements: any;
+  layergroup = faLayerGroup;
+  mapsigns = faMapSigns;
+  atlas = faAtlas;
 
   constructor() { }
 

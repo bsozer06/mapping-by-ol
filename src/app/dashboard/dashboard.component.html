@@ -1,5 +1,5 @@
 <div class="sidenav">
-  <h4>Base Map Layers</h4>
+  <h4><fa-icon [icon]="layergroup"></fa-icon>Base Map Layers</h4>
   <input type="radio" name='baseMapLayerRadio' value='googleSatelliteMap' style="margin-left: 10px;" checked>
   <label class="radioLayer">Google Satellite Map</label><br>
   <input type="radio" name='baseMapLayerRadio' value='googleRoadMap' style="margin-left: 10px;">
@@ -18,12 +18,12 @@
   <label class="radioLayer">Stamen Toner</label><br>
   <input type="radio" name='baseMapLayerRadio' value='stamenWatercolornMap' style="margin-left: 10px;">
   <label class="radioLayer">Stamen Watercolor</label><br>
-  <h4>Vector Layers</h4>
+  <h4><fa-icon [icon]="mapsigns"></fa-icon> Vector Layers</h4>
   <input type="checkbox" name="layerCheckBox" value="TcCitiesGeoJSON" style="margin-left: 10px;" checked>
   <label class="checkBoxLayer">Boundaries of Turkey</label><br>
   <input type="checkbox" name="layerCheckBox" value="TcCityCentersGeoJSON" style="margin-left: 10px;">
   <label class="checkBoxLayer">City Center in Turkey</label><br>
-  <h4>Services</h4>
+  <h4><fa-icon [icon]="atlas"></fa-icon> Services</h4>
   <input type="checkbox" name="layerCheckBox" value="roadsInAnkara" style="margin-left: 10px;">
   <label class="checkBoxLayer">The roads of Ankara</label>
 </div>
