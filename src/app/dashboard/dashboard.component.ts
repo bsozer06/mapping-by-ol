@@ -25,6 +25,9 @@ import LayerGroup from 'ol/layer/Group';
 import { mapToMapExpression } from '@angular/compiler/src/render3/util';
 import { features } from 'process';
 import OverlayPositioning from 'ol/OverlayPositioning';
+import Polygon from 'ol/geom/Polygon';
+import GeometryType from 'ol/geom/GeometryType';
+import { parse } from '@fortawesome/fontawesome-svg-core';
 
 
 @Component({
@@ -322,6 +325,21 @@ export class DashboardComponent implements OnInit {
       })
     });
 
+    const drawPolygon = new olInteraction.Draw({
+      type: 'Polygon' as GeometryType
+    })
+    this.map.addInteraction(drawPolygon);
+
+    drawPolygon.on('drawend', function(evt) {
+      let parser = new GeoJSON();
+      let drawnFeatureObject = parser.writeFeaturesObject([evt.feature]);       /// as an object json
+      let drawnFeature = parser.writeFeatures([evt.feature]);                 /// as an string json
+      console.log(drawnFeature);
+    });
+
+    // clickedButton() {
+    //   console.log('clicked!')
+    // };
 
 
 
