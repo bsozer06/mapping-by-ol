@@ -1,9 +1,9 @@
-import { faLayerGroup, faMapSigns, faAtlas } from '@fortawesome/free-solid-svg-icons';
+import { faLayerGroup, faMapSigns, faAtlas, faSquare } from '@fortawesome/free-solid-svg-icons';
 
 import 'ol/ol.css';
 import { registerLocaleData } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, NgZone, OnInit, Output, ViewChild } from '@angular/core';
-import { View, Map, Tile, Overlay, Feature } from 'ol';
+import { View, Map, Tile, Overlay } from 'ol';
 import { Coordinate, createStringXY } from 'ol/coordinate';
 import { Extent } from 'ol/extent';
 import { get as GetProjection, transform } from 'ol/proj'
@@ -23,11 +23,13 @@ import { CoordinateFormat } from 'ol/coordinate';
 import Layer from 'ol/layer/Layer';
 import LayerGroup from 'ol/layer/Group';
 import { mapToMapExpression } from '@angular/compiler/src/render3/util';
-import { features } from 'process';
 import OverlayPositioning from 'ol/OverlayPositioning';
-import Polygon from 'ol/geom/Polygon';
 import GeometryType from 'ol/geom/GeometryType';
 import { parse } from '@fortawesome/fontawesome-svg-core';
+
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import Polygon from 'ol/geom/Polygon';
 
 
 @Component({
@@ -55,8 +57,12 @@ export class DashboardComponent implements OnInit {
   layergroup = faLayerGroup;
   mapsigns = faMapSigns;
   atlas = faAtlas;
+  square = faSquare;
+  buttonInfo: boolean;
 
-  constructor() { }
+  constructor() {
+    this.buttonInfo=false;
+   }
 
   ngOnInit(): void {
 
@@ -158,7 +164,7 @@ export class DashboardComponent implements OnInit {
         url: "./assets/TcIller.geojson",
         // attributions: []
       }),
-      visible: true,
+      visible: false,
     });
     TcCitiesGeoJSON.set('title', 'TcCitiesGeoJSON')
 
@@ -206,6 +212,21 @@ export class DashboardComponent implements OnInit {
       visible: false
     });
     roadsInAnkara.set('title', "roadsInAnkara");
+
+    const clusteringMap = new TileLayer({
+      source: new TileWMS({
+        url:"http://localhost:8080/geoserver/Burhan/wms",
+        params: {
+          'LAYERS':'Burhan:RandomPointsInTurkey',
+          'FORMAT':'image/png',
+          'TRANSPARENT': true,
+          'TILE': true
+        },
+        serverType: 'geoserver'
+      }),
+      visible:true
+    });
+    clusteringMap.set('title', 'ClusteringInTurkey');
 
 
     this.ControlOptions = [     // in the book
@@ -271,7 +292,7 @@ export class DashboardComponent implements OnInit {
 
     // layer group olusturuldu cunku array olarak add islemi yapilamaz !
     this.layerGroup = new LayerGroup({
-      layers: [TcCitiesGeoJSON, TcCityCentersGeoJSON, roadsInAnkara]
+      layers: [TcCitiesGeoJSON, TcCityCentersGeoJSON, roadsInAnkara, clusteringMap]
     });
     this.map.addLayer(this.layerGroup);
 
@@ -325,10 +346,19 @@ export class DashboardComponent implements OnInit {
       })
     });
 
+
+
+    // var polygonSelect = document.getElementById("polygon-type");
+
+
+    /*var sourceForDrawnPolygon = new VectorSource({ wrapX: false });
+    var vectorForDrawnPolygon = new VectorLayer({ source: sourceForDrawnPolygon });
+    this.map.addLayer(vectorForDrawnPolygon);
+
     const drawPolygon = new olInteraction.Draw({
-      type: 'Polygon' as GeometryType
-    })
-    this.map.addInteraction(drawPolygon);
+      type: 'Polygon' as GeometryType,
+      source: sourceForDrawnPolygon
+    });
 
     drawPolygon.on('drawend', function(evt) {
       let parser = new GeoJSON();
@@ -337,11 +367,70 @@ export class DashboardComponent implements OnInit {
       console.log(drawnFeature);
     });
 
-    // clickedButton() {
-    //   console.log('clicked!')
-    // };
+    this.map.addInteraction(drawPolygon);*/
 
+    /*
+    var sourceForDrawnPolygon = new VectorSource({ wrapX: false });
+    var vectorForDrawnPolygon = new VectorLayer({ source: sourceForDrawnPolygon });
+    this.map.addLayer(vectorForDrawnPolygon);
+    var drawPolygon; // for doing global, later it is removed !
+      var value = "Polygon" as GeometryType
+      drawPolygon = new olInteraction.Draw({
+        source: sourceForDrawnPolygon,
+        type: value
+    })
+    this.map.addInteraction(drawPolygon);
+    */
 
 
   }
+
+  drawPolygonButton() {
+    // var firstClicked = true;    // for testing
+
+    // if (firstClicked = true) {      // for testing
+
+      var startDrawing = false;     // for testing
+
+      var sourceForDrawnPolygon = new VectorSource({ wrapX: false });
+      var vectorForDrawnPolygon = new VectorLayer({ source: sourceForDrawnPolygon });
+      this.map.addLayer(vectorForDrawnPolygon);
+
+      var drawPolygon = new olInteraction.Draw({
+        type: 'Polygon' as GeometryType,
+        source: sourceForDrawnPolygon
+      });
+
+      drawPolygon.on('drawstart', (evt) => {
+        startDrawing = true;    // for testing
+        console.log(startDrawing);
+      });
+
+      drawPolygon.on('drawend', function (evt) {
+        var parser = new GeoJSON();
+        var drawnFeatureObject = parser.writeFeaturesObject([evt.feature]);       /// as an object json
+        var drawnFeature = parser.writeFeatures([evt.feature]);                 /// as an string json
+        //console.log(drawnFeature);
+        startDrawing = false;   // for testing
+        console.log(startDrawing);
+        drawPolygon.finishDrawing();    // for testing
+      });
+
+      this.map.addInteraction(drawPolygon);
+      // firstClicked = false;   // for testing
+
+      /*
+      this.map.on('dbclick', (evt) => {
+        if(startDrawing) {
+          // drawPolygon.finishDrawing();
+          this.map.removeInteraction(drawPolygon);
+        }
+      });
+      */
+
+    // }     // for testing
+
+    // return firstClicked;
+  }
+
 }
