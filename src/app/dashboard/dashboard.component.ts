@@ -1,4 +1,4 @@
-import { faLayerGroup, faMapSigns, faAtlas, faSquare } from '@fortawesome/free-solid-svg-icons';
+import { faLayerGroup, faMapSigns, faAtlas, faSquare, faDrawPolygon, faCircle, faGripLines } from '@fortawesome/free-solid-svg-icons';
 
 import 'ol/ol.css';
 import { registerLocaleData } from '@angular/common';
@@ -57,12 +57,14 @@ export class DashboardComponent implements OnInit {
   layergroup = faLayerGroup;
   mapsigns = faMapSigns;
   atlas = faAtlas;
-  square = faSquare;
+  DrawPolygon = faDrawPolygon;
+  circle = faCircle;
+  GripLines = faGripLines;
   buttonInfo: boolean;
 
   constructor() {
-    this.buttonInfo=false;
-   }
+    this.buttonInfo = false;
+  }
 
   ngOnInit(): void {
 
@@ -215,16 +217,16 @@ export class DashboardComponent implements OnInit {
 
     const clusteringMap = new TileLayer({
       source: new TileWMS({
-        url:"http://localhost:8080/geoserver/Burhan/wms",
+        url: "http://localhost:8080/geoserver/Burhan/wms",
         params: {
-          'LAYERS':'Burhan:RandomPointsInTurkey',
-          'FORMAT':'image/png',
+          'LAYERS': 'Burhan:RandomPointsInTurkey',
+          'FORMAT': 'image/png',
           'TRANSPARENT': true,
           'TILE': true
         },
         serverType: 'geoserver'
       }),
-      visible:true
+      visible: true
     });
     clusteringMap.set('title', 'ClusteringInTurkey');
 
@@ -332,7 +334,7 @@ export class DashboardComponent implements OnInit {
       this.map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
         overlayLayer.setPosition(undefined);
         // console.log(feature, layer);
-        console.log(feature.getProperties());
+        // console.log(feature.getProperties());
         let clickedCoordinate = evt.coordinate;
         let clickedFeatureName = feature.get("iladi");
         let clickedFeatureCode = feature.get("il_prinx");
@@ -387,50 +389,107 @@ export class DashboardComponent implements OnInit {
 
   drawPolygonButton() {
     // var firstClicked = true;    // for testing
+    var startDrawing = false;     // for testing
 
-    // if (firstClicked = true) {      // for testing
+    var sourceForDrawnPolygon = new VectorSource({ wrapX: false });
+    var vectorForDrawnPolygon = new VectorLayer({ source: sourceForDrawnPolygon });
+    this.map.addLayer(vectorForDrawnPolygon);
 
-      var startDrawing = false;     // for testing
+    var drawPolygon = new olInteraction.Draw({
+      type: 'Polygon' as GeometryType,
+      source: sourceForDrawnPolygon
+    });
 
-      var sourceForDrawnPolygon = new VectorSource({ wrapX: false });
-      var vectorForDrawnPolygon = new VectorLayer({ source: sourceForDrawnPolygon });
-      this.map.addLayer(vectorForDrawnPolygon);
+    drawPolygon.on('drawstart', (evt) => {
+      startDrawing = true;    // for testing
+      // console.log(startDrawing);
+    });
 
-      var drawPolygon = new olInteraction.Draw({
-        type: 'Polygon' as GeometryType,
-        source: sourceForDrawnPolygon
-      });
+    drawPolygon.on('drawend', (evt) => {
+      var parser = new GeoJSON();
+      var drawnFeatureObject = parser.writeFeaturesObject([evt.feature]);       /// as an object json
+      var drawnFeature = parser.writeFeatures([evt.feature]);                 /// as an string json
+      console.log(evt.feature);
+      startDrawing = false;   // for testing
+      // console.log(startDrawing);
+      this.map.removeInteraction(drawPolygon);      /**** this is important due to finish drawing process ! ***/
+    });
 
-      drawPolygon.on('drawstart', (evt) => {
-        startDrawing = true;    // for testing
-        console.log(startDrawing);
-      });
+    this.map.addInteraction(drawPolygon);
+    // drawPolygon.abortDrawing();      /// for testing
 
-      drawPolygon.on('drawend', function (evt) {
+    /******* drawn the polygon is download after clicking it ! --- developing !!!!!! ******/
+    this.map.on('click', (evt) => {
+      this.map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
+        // console.log(feature.getGeometry());
+        // console.log(feature.getProperties());
         var parser = new GeoJSON();
-        var drawnFeatureObject = parser.writeFeaturesObject([evt.feature]);       /// as an object json
-        var drawnFeature = parser.writeFeatures([evt.feature]);                 /// as an string json
-        //console.log(drawnFeature);
-        startDrawing = false;   // for testing
-        console.log(startDrawing);
-        drawPolygon.finishDrawing();    // for testing
-      });
+        var selectedDrawnFeature = feature as Feature;
+        var drawnFeatureJsonObject = parser.writeFeaturesObject([selectedDrawnFeature]);       /// as an object json
+        var drawnFeatureJsonString = parser.writeFeatures([selectedDrawnFeature]);
+        console.log(drawnFeatureJsonString);
 
-      this.map.addInteraction(drawPolygon);
-      // firstClicked = false;   // for testing
-
-      /*
-      this.map.on('dbclick', (evt) => {
-        if(startDrawing) {
-          // drawPolygon.finishDrawing();
-          this.map.removeInteraction(drawPolygon);
-        }
-      });
-      */
-
-    // }     // for testing
-
-    // return firstClicked;
+        var txtFile = "test.txt";
+        var file = new File([""], txtFile, {type: "text/plain"});
+        var dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(drawnFeatureJsonString);
+        var link = (<HTMLAnchorElement>document.getElementById('link')).href = dataUri;
+      })
+    });
   }
+
+  drawPointButton() {
+    var startDrawing = false;
+    var sourceForDrawnPoint = new VectorSource({ wrapX: false });
+    var vectorForDrawnPoint = new VectorLayer({ source: sourceForDrawnPoint });
+    this.map.addLayer(vectorForDrawnPoint);
+
+    var drawPoint = new olInteraction.Draw({
+      type: 'Point' as GeometryType,
+      source: sourceForDrawnPoint
+    });
+
+    drawPoint.on('drawstart', (evt) => {
+      startDrawing = true;    // for testing
+      console.log(startDrawing);
+    });
+
+    drawPoint.on('drawend', (evt) => {
+      var parser = new GeoJSON();
+      var drawnFeatureObject = parser.writeFeaturesObject([evt.feature]);       /// as an object json
+      var drawnFeature = parser.writeFeatures([evt.feature]);                 /// as an string json
+      //console.log(drawnFeature);
+      startDrawing = false;   // for testing
+      this.map.removeInteraction(drawPoint);      /**** this is important due to finish drawing process ! ***/
+    });
+
+    this.map.addInteraction(drawPoint);
+  }
+
+  drawLineButton() {
+    var startDrawing = false;
+    var sourceForDrawnLine = new VectorSource({ wrapX: false });
+    var vectorForDrawnLine = new VectorLayer({ source: sourceForDrawnLine });
+    this.map.addLayer(vectorForDrawnLine);
+
+    var drawLine = new olInteraction.Draw({
+      type: 'LineString' as GeometryType,
+      source: sourceForDrawnLine
+    });
+
+    drawLine.on('drawstart', (evt) => {
+      console.log(startDrawing);
+    });
+
+    drawLine.on('drawend', (evt) => {
+      var parser = new GeoJSON();
+      var drawnFeatureObject = parser.writeFeaturesObject([evt.feature]);       /// as an object json
+      var drawnFeature = parser.writeFeatures([evt.feature]);                 /// as an string json
+      //console.log(drawnFeature);
+      this.map.removeInteraction(drawLine);      /**** this is important due to finish drawing process ! ***/
+    });
+
+    this.map.addInteraction(drawLine);
+  }
+
 
 }

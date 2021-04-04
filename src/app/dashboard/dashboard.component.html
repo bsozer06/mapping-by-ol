@@ -37,9 +37,22 @@
 
   <h4>Operations</h4>
   <button id="polygon-type" (click)="drawPolygonButton()" (mouseover)="buttonInfo=true" (mouseout)="buttonInfo=false">
-    <fa-icon [icon]="square"></fa-icon>
+    <fa-icon [icon]="DrawPolygon"></fa-icon>
   </button>
-  <span *ngIf="buttonInfo" class="badge badge-light">Drawing Polygon</span>
+  <!-- <span *ngIf="buttonInfo" class="badge badge-light">Drawing Polygon</span> -->
+  <button id="line-type" (click)="drawLineButton()" (mouseover)="buttonInfo=true" (mouseout)="buttonInfo=false">
+    <fa-icon [icon]="GripLines"></fa-icon>
+  </button>
+  <!-- <span *ngIf="buttonInfo" class="badge badge-light">Drawing Point</span> -->
+  <button id="point-type" (click)="drawPointButton()" (mouseover)="buttonInfo=true" (mouseout)="buttonInfo=false">
+    <fa-icon [icon]="circle"></fa-icon>
+  </button>
+  <a href="#" id="link" download="example.json">
+    Download as JSON
+  </a>
+
+  <!-- <span *ngIf="buttonInfo" class="badge badge-light">Drawing Point</span> -->
+
 </div>
 
 <p style="margin-left: 200px">dashboard is working !!</p>
