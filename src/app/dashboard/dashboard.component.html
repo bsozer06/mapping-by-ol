@@ -1,6 +1,8 @@
+<div style="padding:15px ;background:rgb(14, 15, 14)"></div>
+
 <div class="sidenav">
   <h4>
-    <fa-icon [icon]="layergroup"></fa-icon>Base Map Layers
+    <fa-icon [icon]="layergroup"></fa-icon> Base Map Layers
   </h4>
   <input type="radio" name='baseMapLayerRadio' value='googleSatelliteMap' style="margin-left: 10px;" checked>
   <label class="radioLayer">Google Satellite Map</label><br>
@@ -35,27 +37,30 @@
   <input type="checkbox" name="layerCeheckBox" value="ClusteringInTurkey" style="margin-left: 10px;" checked>
   <label class="checkBoxLayer">Clustering Map</label>
 
-  <h4>Operations</h4>
-  <button id="polygon-type" (click)="drawPolygonButton()" (mouseover)="buttonInfo=true" (mouseout)="buttonInfo=false">
+  <h4>
+    <fa-icon [icon]="Task"></fa-icon> Drawing
+  </h4>
+  <button id="polygon-type" (click)="drawPolygonButton()" (mouseover)="buttonInfo=true" (mouseout)="buttonInfo=false" style="font-size: small;margin-left: 5px;">
     <fa-icon [icon]="DrawPolygon"></fa-icon>
   </button>
   <!-- <span *ngIf="buttonInfo" class="badge badge-light">Drawing Polygon</span> -->
-  <button id="line-type" (click)="drawLineButton()" (mouseover)="buttonInfo=true" (mouseout)="buttonInfo=false">
+  <button id="line-type" (click)="drawLineButton()" (mouseover)="buttonInfo=true" (mouseout)="buttonInfo=false" style="font-size: small;">
     <fa-icon [icon]="GripLines"></fa-icon>
   </button>
   <!-- <span *ngIf="buttonInfo" class="badge badge-light">Drawing Point</span> -->
-  <button id="point-type" (click)="drawPointButton()" (mouseover)="buttonInfo=true" (mouseout)="buttonInfo=false">
+  <button id="point-type" (click)="drawPointButton()" (mouseover)="buttonInfo=true" (mouseout)="buttonInfo=false" style="font-size: small;">
     <fa-icon [icon]="circle"></fa-icon>
-  </button>
-  <a href="#" id="link" download="example.json">
-    Download as JSON
+  </button><br>
+  <h4 style="padding-top: 5px;">Others</h4>
+  <a href="#" id="link" download="example.json" style="font-size: medium; padding-top: 0px;">
+    <fa-icon [icon]="Download"></fa-icon>
   </a>
 
   <!-- <span *ngIf="buttonInfo" class="badge badge-light">Drawing Point</span> -->
 
 </div>
 
-<p style="margin-left: 200px">dashboard is working !!</p>
+<!-- <p style="margin-left: 200px">dashboard is working !!</p> -->
 
 <div class="map-container" style="margin-left: 200px">
 
@@ -65,5 +70,7 @@
   </div>
 
   <div id="map" class="map"></div>
-  <div id="coordinates"><span id="coordinate-span">Koordinatlar</span></div>
+  <div id="coordinates" >
+    <span id="coordinate-span" style="background:rgb(14, 15, 14)">Koordinatlar</span>
+  </div>
 </div>

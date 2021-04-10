@@ -1,4 +1,4 @@
-import { faLayerGroup, faMapSigns, faAtlas, faSquare, faDrawPolygon, faCircle, faGripLines } from '@fortawesome/free-solid-svg-icons';
+import { faLayerGroup, faMapSigns, faAtlas, faDrawPolygon, faCircle, faGripLines, faDownload, faTasks } from '@fortawesome/free-solid-svg-icons';
 
 import 'ol/ol.css';
 import { registerLocaleData } from '@angular/common';
@@ -60,6 +60,8 @@ export class DashboardComponent implements OnInit {
   DrawPolygon = faDrawPolygon;
   circle = faCircle;
   GripLines = faGripLines;
+  Download = faDownload;
+  Task = faTasks;
   buttonInfo: boolean;
 
   constructor() {
@@ -349,6 +351,26 @@ export class DashboardComponent implements OnInit {
     });
 
 
+    //////// To perform get info from WFS ---> developing ! -- BURAYA DEVAM ET  ///////
+
+    this.map.on('click',  function(evt)  {
+
+      var feature = this.map.forEachFeatureAtPixel(evt.pixel,  (feature, layer) => {
+        return feature;
+      });
+
+      if (feature) {
+
+        var coord = feature.getGeometry().getCoordinates();
+        var props = feature.getProperties();
+        console.log(props);
+
+      }
+    }
+    )}
+
+
+
 
     // var polygonSelect = document.getElementById("polygon-type");
 
@@ -385,14 +407,22 @@ export class DashboardComponent implements OnInit {
     */
 
 
-  }
+
 
   drawPolygonButton() {
     // var firstClicked = true;    // for testing
     var startDrawing = false;     // for testing
 
-    var sourceForDrawnPolygon = new VectorSource({ wrapX: false });
+    var sourceForDrawnPolygon = new VectorSource({
+      wrapX: false,
+      format: new GeoJSON({
+        dataProjection: "EPSG:4326",
+        featureProjection: "EPSG:3857"
+      })
+    });
+
     var vectorForDrawnPolygon = new VectorLayer({ source: sourceForDrawnPolygon });
+
     this.map.addLayer(vectorForDrawnPolygon);
 
     var drawPolygon = new olInteraction.Draw({
@@ -406,12 +436,7 @@ export class DashboardComponent implements OnInit {
     });
 
     drawPolygon.on('drawend', (evt) => {
-      var parser = new GeoJSON();
-      var drawnFeatureObject = parser.writeFeaturesObject([evt.feature]);       /// as an object json
-      var drawnFeature = parser.writeFeatures([evt.feature]);                 /// as an string json
-      console.log(evt.feature);
       startDrawing = false;   // for testing
-      // console.log(startDrawing);
       this.map.removeInteraction(drawPolygon);      /**** this is important due to finish drawing process ! ***/
     });
 
@@ -423,19 +448,24 @@ export class DashboardComponent implements OnInit {
       this.map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
         // console.log(feature.getGeometry());
         // console.log(feature.getProperties());
-        var parser = new GeoJSON();
+        var parser = new GeoJSON({
+          dataProjection: "EPSG:4326",
+          featureProjection: "EPSG:3857"
+        });
         var selectedDrawnFeature = feature as Feature;
         var drawnFeatureJsonObject = parser.writeFeaturesObject([selectedDrawnFeature]);       /// as an object json
-        var drawnFeatureJsonString = parser.writeFeatures([selectedDrawnFeature]);
+        var drawnFeatureJsonString = parser.writeFeatures([selectedDrawnFeature]);            /// as an string json
         console.log(drawnFeatureJsonString);
 
         var txtFile = "test.txt";
-        var file = new File([""], txtFile, {type: "text/plain"});
-        var dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(drawnFeatureJsonString);
+        var file = new File([""], txtFile, { type: "text/plain" });
+        var dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(drawnFeatureJsonString);
         var link = (<HTMLAnchorElement>document.getElementById('link')).href = dataUri;
       })
     });
+
   }
+
 
   drawPointButton() {
     var startDrawing = false;
@@ -491,5 +521,6 @@ export class DashboardComponent implements OnInit {
     this.map.addInteraction(drawLine);
   }
 
-
 }
+
+
